@@ -13,134 +13,117 @@ angular.module('Eggly', [
     $urlRouterProvider.otherwise('/');
 })
 
-.controller('MainCtrl', function($scope) {
-    $scope.categories = [
-        {"id": 0, "name": "Development"},
-        {"id": 1, "name": "Design"},
-        {"id": 2, "name": "Exercise"},
-        {"id": 3, "name": "Humor"},
-    ];
+.controller('MainCtrl', function($scope, $state) {
 
-    $scope.bookmarks = [
-            {"id": 0, "title": "AngularJS", "url": "http://angularjs.org", "category": "Development" },
-            {"id": 1, "title": "Egghead.io", "url": "http://angularjs.org", "category": "Development" },
-            {"id": 2, "title": "A List Apart", "url": "http://alistapart.com/", "category": "Design" },
-            {"id": 3, "title": "One Page Love", "url": "http://onepagelove.com/", "category": "Design" },
-            {"id": 4, "title": "MobilityWOD", "url": "http://www.mobilitywod.com/", "category": "Exercise" },
-            {"id": 5, "title": "Robb Wolf", "url": "http://robbwolf.com/", "category": "Exercise" },
-            {"id": 6, "title": "Senor Gif", "url": "http://memebase.cheezburger.com/senorgif", "category": "Humor" },
-            {"id": 7, "title": "Wimp", "url": "http://wimp.com", "category": "Humor" },
-            {"id": 8, "title": "Dump", "url": "http://dump.com", "category": "Humor" }
-        ];
+    $scope.currentCategory = null;
 
-        $scope.currentCategory = null;
+    function setCurrentCategory(category) {
+        $scope.currentCategory = category;
 
-        function setCurrentCategory(category) {
-            $scope.currentCategory = category;
-            cancelCreating();
-            cancelEditing();
-        }
+        cancelCreating();
+        cancelEditing();
+    }
 
-        function isCurrentCategory(category) {
-            return $scope.currentCategory !== null && category.name === $scope.currentCategory.name;
-        }
+    function isCurrentCategory(category) {
+        return $scope.currentCategory !== null && category.name === $scope.currentCategory.name;
+    }
 
-        $scope.setCurrentCategory = setCurrentCategory;
-        $scope.isCurrentCategory = isCurrentCategory;
+    $scope.setCurrentCategory = setCurrentCategory;
+    $scope.isCurrentCategory = isCurrentCategory;
 
-        //----------------------------------------------------------------------
-        // CRUD
-        //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    // CRUD
+    //----------------------------------------------------------------------
 
-        function resetCreateForm() {
-            $scope.newBookmark = {
-                title: '',
-                url: '',
-                category: $scope.currentCategory.name
-            };
-        }
+    function resetCreateForm() {
+        $scope.newBookmark = {
+            title: '',
+            url: '',
+            category: $scope.currentCategory.name
+        };
+    }
 
-        function createBookmark(bookmark) {
-            bookmark.id = $scope.bookmarks.length;
-            $scope.bookmarks.push(bookmark);
+    function createBookmark(bookmark) {
+        bookmark.id = $scope.bookmarks.length;
+        $scope.bookmarks.push(bookmark);
 
-            resetCreateForm();
-        }
+        resetCreateForm();
+    }
 
-        $scope.createBookmark = createBookmark;
+    $scope.createBookmark = createBookmark;
+
+    $scope.editedBookmark = null;
+
+    function setEditedBookmark(bookmark) {
+        $scope.editedBookmark = angular.copy(bookmark);
+    }
+
+    function updateBookmark(bookmark) {
+        let index = _.findIndex($scope.bookmarks, function(b) {
+            return b.id == bookmark.id;
+        });
+        $scope.bookmarks[index] = bookmark;
 
         $scope.editedBookmark = null;
-
-        function setEditedBookmark(bookmark) {
-            $scope.editedBookmark = angular.copy(bookmark);
-        }
-
-        function updateBookmark(bookmark) {
-            let index = _.findIndex($scope.bookmarks, function(b) {
-                return b.id == bookmark.id;
-            });
-            $scope.bookmarks[index] = bookmark;
-
-            $scope.editedBookmark = null;
-            $scope.isEditing = false;
-        }
-
-        function isSelectedBookmark(bookmarkId) {
-            return $scope.editedBookmark !== null && $scope.editedBookmark.id === bookmarkId;
-        }
-
-        $scope.setEditedBookmark = setEditedBookmark;
-        $scope.updateBookmark = updateBookmark;
-        $scope.isSelectedBookmark = isSelectedBookmark;
-
-        function deleteBookmark(bookmark) {
-            _.remove($scope.bookmarks, function(b) {
-                return b.id == bookmark.id;
-            });
-        }
-
-        $scope.deleteBookmark = deleteBookmark;
-
-        //----------------------------------------------------------------------
-        // Creating and Editing States
-        //----------------------------------------------------------------------
-
-        $scope.isCreating = false;
         $scope.isEditing = false;
+    }
 
-        function startCreating() {
-            $scope.isEditing = false;
-            $scope.isCreating = true;
+    function isSelectedBookmark(bookmarkId) {
+        return $scope.editedBookmark !== null && $scope.editedBookmark.id === bookmarkId;
+    }
 
-            resetCreateForm();
-        }
+    $scope.setEditedBookmark = setEditedBookmark;
+    $scope.updateBookmark = updateBookmark;
+    $scope.isSelectedBookmark = isSelectedBookmark;
 
-        function cancelCreating() {
-            $scope.isCreating = false;
-        }
+    function deleteBookmark(bookmark) {
+        _.remove($scope.bookmarks, function(b) {
+            return b.id == bookmark.id;
+        });
+    }
 
-        function startEditing() {
-            $scope.isCreating = false;
-            $scope.isEditing = true;
-        }
+    $scope.deleteBookmark = deleteBookmark;
 
-        function cancelEditing() {
-            $scope.editedBookmark = null;
-            $scope.isEditing = false;
-        }
+    //----------------------------------------------------------------------
+    // Creating and Editing States
+    //----------------------------------------------------------------------
 
-        function shouldShowCreating() {
-            return $scope.currentCategory && !$scope.isEditing;
-        }
+    $scope.isCreating = false;
+    $scope.isEditing = false;
 
-        function shouldShowEditing() {
-            return $scope.isEditing && !$scope.isCreating;
-        }
+    function startCreating() {
+        $scope.isEditing = false;
+        $scope.isCreating = true;
 
-        $scope.startCreating = startCreating;
-        $scope.cancelCreating = cancelCreating;
-        $scope.startEditing = startEditing;
-        $scope.cancelEditing = cancelEditing;
-        $scope.shouldShowCreating = shouldShowCreating;
-        $scope.shouldShowEditing = shouldShowEditing;
+        resetCreateForm();
+    }
+
+    function cancelCreating() {
+        $scope.isCreating = false;
+    }
+
+    function startEditing() {
+        $scope.isCreating = false;
+        $scope.isEditing = true;
+    }
+
+    function cancelEditing() {
+        $scope.editedBookmark = null;
+        $scope.isEditing = false;
+    }
+
+    function shouldShowCreating() {
+        return $scope.currentCategory && !$scope.isEditing;
+    }
+
+    function shouldShowEditing() {
+        return $scope.isEditing && !$scope.isCreating;
+    }
+
+    $scope.startCreating = startCreating;
+    $scope.cancelCreating = cancelCreating;
+    $scope.startEditing = startEditing;
+    $scope.cancelEditing = cancelEditing;
+    $scope.shouldShowCreating = shouldShowCreating;
+    $scope.shouldShowEditing = shouldShowEditing;
 });
