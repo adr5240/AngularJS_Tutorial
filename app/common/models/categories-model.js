@@ -6,7 +6,8 @@ angular.module('eggly.models.categories', [
             URLS = {
                 FETCH: 'data/categories.json'
             },
-            categories;
+            categories,
+            currentCategory;
 
         function extract(result) {
             return result.data;
@@ -19,6 +20,21 @@ angular.module('eggly.models.categories', [
 
         model.getCategories = function () {
             return (categories) ? $q.when(categories) : $http.get(URLS.FETCH).then(cacheCategories);
+        };
+
+        model.setCurrentCategory = function (categoryName) {
+            return model.getCategoryByName(categoryName)
+                .then(function(category) {
+                    currentCategory = category;
+                });
+        };
+
+        model.getCurrentCategory = function () {
+            return currentCategory;
+        };
+
+        model.getCurrentCategoryName = function () {
+            return currentCategory ? currentCategory.name : '';
         };
 
         model.getCategoryByName = function (categoryName) {
