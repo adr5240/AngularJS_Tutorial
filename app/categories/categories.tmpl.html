@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html>
-    <head lang="en">
-        <meta charset="utf-8">
-        <title></title>
-    </head>
-    <body>
-
-    </body>
-</html>
+<a href="#" ng-click="setCurrentCategory(null)"><img class="logo" src="assets/img/eggly-logo.png"></a>
+<ul class="nav nav-sidebar">
+    <li ng-repeat="category in categories" ng-class="{'active':isCurrentCategory(category)}">
+        <a href="#" ng-click="setCurrentCategory(category)">{{category.name}}</a>
+    </li>
+</ul>
