@@ -81,8 +81,16 @@ angular.module('Eggly', [
         $scope.updateBookmark = updateBookmark;
         $scope.isSelectedBookmark = isSelectedBookmark;
 
+        function deleteBookmark(bookmark) {
+            _.remove($scope.bookmarks, function(b) {
+                return b.id == bookmark.id;
+            });
+        }
+
+        $scope.deleteBookmark = deleteBookmark;
+
         //----------------------------------------------------------------------
-        // Creating and Editing
+        // Creating and Editing States
         //----------------------------------------------------------------------
 
         $scope.isCreating = false;
@@ -105,6 +113,7 @@ angular.module('Eggly', [
         }
 
         function cancelEditing() {
+            $scope.editedBookmark = null;
             $scope.isEditing = false;
         }
 
