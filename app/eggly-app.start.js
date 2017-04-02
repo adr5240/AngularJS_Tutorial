@@ -25,7 +25,6 @@ angular.module('Eggly', [
 
         function setCurrentCategory(category) {
             $scope.currentCategory = category;
-
             cancelCreating();
             cancelEditing();
         }
@@ -37,12 +36,63 @@ angular.module('Eggly', [
         $scope.setCurrentCategory = setCurrentCategory;
         $scope.isCurrentCategory = isCurrentCategory;
 
+        //----------------------------------------------------------------------
+        // CRUD
+        //----------------------------------------------------------------------
+
+        function resetCreateForm() {
+            $scope.newBookmark = {
+                title: '',
+                url: '',
+                category: $scope.currentCategory.name
+            };
+        }
+
+        function createBookmark(bookmark) {
+            bookmark.id = $scope.bookmarks.length;
+            $scope.bookmarks.push(bookmark);
+
+            resetCreateForm();
+        }
+
+        $scope.createBookmark = createBookmark;
+
+        $scope.editedBookmark = null;
+
+        function setEditedBookmark(bookmark) {
+            $scope.editedBookmark = angular.copy(bookmark);
+        }
+
+        function updateBookmark(bookmark) {
+            let index = _.findIndex($scope.bookmarks, function(b) {
+                return b.id == bookmark.id;
+            });
+            $scope.bookmarks[index] = bookmark;
+
+            $scope.editedBookmark = null;
+            $scope.isEditing = false;
+        }
+
+        function isSelectedBookmark(bookmarkId) {
+            return $scope.editedBookmark !== null && $scope.editedBookmark.id === bookmarkId;
+        }
+
+        $scope.setEditedBookmark = setEditedBookmark;
+        $scope.updateBookmark = updateBookmark;
+        $scope.isSelectedBookmark = isSelectedBookmark;
+
+        //----------------------------------------------------------------------
+        // Creating and Editing
+        //----------------------------------------------------------------------
+
         $scope.isCreating = false;
         $scope.isEditing = false;
 
         function startCreating() {
             $scope.isEditing = false;
             $scope.isCreating = true;
+
+            resetCreateForm();
         }
 
         function cancelCreating() {
